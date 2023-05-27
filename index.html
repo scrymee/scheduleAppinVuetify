@@ -22,6 +22,48 @@
       </v-app-bar>
 
       <v-main class="grey lighten-3">
+        <v-container v-if="displayFlg" class="pt-6" >
+          <v-sheet elevation="1">
+            <v-timeline
+              align-top
+              dense
+            >
+              <v-timeline-item
+                v-for="plan in plans"
+                :key="plan.id"
+                small
+                :color="plan.id % 2 ? 'teal' : 'pink'"
+              >
+                <v-row class="pt-1">
+                  <v-col cols="3">
+                    <strong>{{plan.time}}</strong>
+                  </v-col>
+                  <v-col>
+                    <strong>{{plan.name}}</strong>
+                    <div class="text-caption mb-2">
+                      Hangouts
+                    </div>
+                    <v-avatar>
+                      <v-img
+                        src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFrida&accessoriesType=Kurt&hairColor=Red&facialHairType=BeardLight&facialHairColor=BrownDark&clotheType=GraphicShirt&clotheColor=Gray01&graphicType=Skull&eyeType=Wink&eyebrowType=RaisedExcitedNatural&mouthType=Disbelief&skinColor=Brown"
+                      ></v-img>
+                    </v-avatar>
+                    <v-avatar>
+                      <v-img
+                        src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairFrizzle&accessoriesType=Prescription02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=BrownDark&clotheType=BlazerSweater&clotheColor=Black&eyeType=Default&eyebrowType=FlatNatural&mouthType=Default&skinColor=Tanned"
+                      ></v-img>
+                    </v-avatar>
+                    <v-avatar>
+                      <v-img
+                        src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairMiaWallace&accessoriesType=Sunglasses&hairColor=BlondeGolden&facialHairType=Blank&clotheType=BlazerSweater&eyeType=Surprised&eyebrowType=RaisedExcited&mouthType=Smile&skinColor=Pale"
+                      ></v-img>
+                    </v-avatar>
+                  </v-col>
+                </v-row>
+              </v-timeline-item>
+            </v-timeline>
+          </v-sheet>
+        </v-container>
         <v-container>
           <v-sheet
             min-height="70vh"
@@ -30,7 +72,7 @@
             elevation="1"
           >
 
-            <pre v-if="displayFlg">{{ JSON.stringify(plans, null, 2) }}</pre>
+            <!-- <pre v-if="displayFlg">{{ JSON.stringify(plans, null, 2) }}</pre> -->
             <v-row align-content="center" class="my-4">
               <v-col align="center">
                 <div class="title font-weight-bold purple--text">予定を入力して素敵な予定を決めよう！</div>
@@ -63,38 +105,6 @@
                 <div class="title font-weight-bold purple--text text-center">タイトル</div>
               </v-col>
             </v-row>
-          </v-sheet>
-        </v-container>
-        <v-container>
-          <v-sheet elevation="1">
-
-            <!--  -->
-            <v-card>
-              <v-subheader dark class="teal text--white font-weight-bold title"><v-icon>mdi-calendar-blank</v-icon>予定表</v-subheader>
-                <v-card-text>
-                  <v-timeline>
-                    <v-timeline-item
-                      v-for="plan in plans"
-                      :key="plan.id"
-                      color="red lighten-2"
-                      large
-                    >
-                      <template v-slot:opposite>
-                        <span class="font-weight-bold red--text headline">{{ plan.time }}</span>
-                      </template>
-                      <v-card class="elevation-2">
-                        <v-card-title class="text-h5">
-                          {{plan.name}}
-                        </v-card-title>
-                        <v-card-text>
-                          {{plan.description}}
-                        </v-card-text>
-                      </v-card>
-                    </v-timeline-item>
-                  </v-timeline>
-                </v-card-text>
-                <v-icon>mdi-trash-can-outline</v-icon> 
-            </v-card>
           </v-sheet>
         </v-container>
       </v-main>
