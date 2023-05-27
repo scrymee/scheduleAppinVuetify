@@ -26,11 +26,11 @@
           <v-sheet
             min-height="70vh"
             rounded="lg"
-            class="pa-4"
+            class="mt-6 pa-4"
             elevation="1"
           >
 
-            <v-row align-content="center" class="mt-1">
+            <v-row align-content="center" class="my-4">
               <v-col align="center">
                 <div class="title font-weight-bold purple--text">予定を入力して素敵な予定を決めよう！</div>
                 <v-btn @click="createSchedule" class="purple font-weight-bold white--text mt-4">予定を作成する</v-btn>
@@ -39,25 +39,23 @@
             <v-row align-content="center">
               <v-col align="center">
                 <v-card class="my-2 col-12" v-for="plan in plans" :key="plan.id">
-                  <v-card-text class="pa-0">
+                  <v-card-text class="pa-0 planList">
                     <v-list-item>
                       <v-list-item-icon cursor><v-icon>mdi-plus-box</v-icon></v-list-item-icon>
                       <v-list-item-content>
                         {{plan.name}}
                       </v-list-item-content>
-                      <v-list-item-icon><v-icon>mdi-trash-can-outline</v-icon></v-list-item-icon>
+                      <v-list-item-icon><v-icon @click="deleteContent(plan.id)">mdi-trash-can-outline</v-icon></v-list-item-icon>
                     </v-list-item>
                   </v-card-text>
                 </v-card>
               </v-col>
             </v-row>
 
-            <v-row>
-              <v-col class="col-lg-4 col-12">
-                <div class="title font-weight-bold purple--text text-center">タイトル</div>
-              </v-col>
-              <v-col class="col-lg-4 col-12">
-                <div class="title font-weight-bold purple--text text-center">タイトル</div>
+            <v-row align-content="center">
+              <v-col class="col-lg-8 col-12" align="center">
+                <div class="mb-4 title font-weight-bold purple--text text-center">設定</div>
+                <v-btn class="purple font-weight-bold white--text" @click="addContent">要素を追加する</v-btn>
               </v-col>
               <v-col class="col-lg-4 col-12">
                 <div class="title font-weight-bold purple--text text-center">タイトル</div>
@@ -125,6 +123,23 @@
         }
       },
       methods: {
+        addContent() {
+
+          // 最新のIDを取得する
+          const newestId = Math.max(...this.plans.map(item => item.id));
+          const plan = {id: newestId + 1, time:'', name:'', description:''}
+          this.plans.push(plan);
+          console.log(this.plans)
+
+        },
+        createSchedule(){
+
+        },
+
+        deleteContent(id) {
+          console.log(id)
+          this.plans = this.plans.filter(plan => plan.id !== id)
+        }
       },
       directives: {
       },
