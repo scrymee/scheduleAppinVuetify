@@ -16,14 +16,14 @@
     <v-app id="inspire">
       <v-app-bar app color="white" flat>
         <v-container class="py-0 fill-height">
-          <v-avatar class="mr-10" color="grey darken-1" size="32"></v-avatar>
+          <v-avatar class="mr-10" color="grey darken-1" size="48"></v-avatar>予定表ジェネレーター
           <v-spacer></v-spacer>
         </v-container>
       </v-app-bar>
 
       <v-main class="grey lighten-3">
-        <v-container v-if="displayFlg" class="pt-6" >
-          <v-sheet elevation="1">
+        <v-container v-if="displayFlg" class="pt-6" ><v-col align="center">
+          <v-sheet elevation="1" max-width="1000px">
             <v-timeline
               align-top
               dense
@@ -63,10 +63,12 @@
               </v-timeline-item>
             </v-timeline>
           </v-sheet>
-        </v-container>
-        <v-container>
+        </v-col></v-container>
+
+        <v-container><v-col align="center">
           <v-sheet
             min-height="70vh"
+            max-width="1000px"
             rounded="lg"
             class="mt-6 pa-4"
             elevation="1"
@@ -106,7 +108,7 @@
               </v-col>
             </v-row>
           </v-sheet>
-        </v-container>
+        </v-col></v-container>
       </v-main>
     </v-app>
   </div>
