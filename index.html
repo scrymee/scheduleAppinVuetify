@@ -30,6 +30,7 @@
             elevation="1"
           >
 
+            <pre v-if="displayFlg">{{ JSON.stringify(plans, null, 2) }}</pre>
             <v-row align-content="center" class="my-4">
               <v-col align="center">
                 <div class="title font-weight-bold purple--text">予定を入力して素敵な予定を決めよう！</div>
@@ -41,9 +42,10 @@
                 <v-card class="my-2 col-12" v-for="plan in plans" :key="plan.id">
                   <v-card-text class="pa-0 planList">
                     <v-list-item>
-                      <v-list-item-icon cursor><v-icon>mdi-plus-box</v-icon></v-list-item-icon>
+                      <v-list-item-icon><v-icon class="text-h3 purple--text">mdi-map-marker-check</v-icon></v-list-item-icon>
                       <v-list-item-content>
-                        {{plan.name}}
+                        <v-text-field v-model="plan.name" label="予定" :counter="20" class="ma-0"></v-text-field>
+                        <!-- {{plan.name}} -->
                       </v-list-item-content>
                       <v-list-item-icon><v-icon @click="deleteContent(plan.id)">mdi-trash-can-outline</v-icon></v-list-item-icon>
                     </v-list-item>
@@ -110,10 +112,7 @@
       vuetify: new Vuetify(),
       data () {
         return {
-          links : [
-            'A',
-            'I'
-          ],
+          displayFlg : false,
           plans : [
             {id: 1, time:'8:30', name: '奈良金魚ミュージアム', description:'テスト'},
             {id: 2, time:'8:30', name: '奈良旅行', description:'テスト'},
@@ -133,6 +132,7 @@
 
         },
         createSchedule(){
+          this.displayFlg = true
 
         },
 
