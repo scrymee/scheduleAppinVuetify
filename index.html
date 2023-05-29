@@ -35,26 +35,14 @@
                 :color="plan.id % 2 ? 'teal' : 'pink'"
               >
                 <v-row class="pt-1">
+                  <v-col cols="3">
+                    <strong>{{plan.id}}:30</strong>
+                  </v-col>
                   <v-col>
                     <strong>{{plan.name}}</strong>
                     <div class="text-caption mb-2">
                       <v-icon class="text-caption">mdi-clock-outline</v-icon>{{plan.time}}
                     </div>
-                    <!-- <v-avatar>
-                      <v-img
-                        src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFrida&accessoriesType=Kurt&hairColor=Red&facialHairType=BeardLight&facialHairColor=BrownDark&clotheType=GraphicShirt&clotheColor=Gray01&graphicType=Skull&eyeType=Wink&eyebrowType=RaisedExcitedNatural&mouthType=Disbelief&skinColor=Brown"
-                      ></v-img>
-                    </v-avatar>
-                    <v-avatar>
-                      <v-img
-                        src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairFrizzle&accessoriesType=Prescription02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=BrownDark&clotheType=BlazerSweater&clotheColor=Black&eyeType=Default&eyebrowType=FlatNatural&mouthType=Default&skinColor=Tanned"
-                      ></v-img>
-                    </v-avatar>
-                    <v-avatar>
-                      <v-img
-                        src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairMiaWallace&accessoriesType=Sunglasses&hairColor=BlondeGolden&facialHairType=Blank&clotheType=BlazerSweater&eyeType=Surprised&eyebrowType=RaisedExcited&mouthType=Smile&skinColor=Pale"
-                      ></v-img>
-                    </v-avatar> -->
                   </v-col>
                 </v-row>
               </v-timeline-item>
@@ -84,9 +72,18 @@
                   <v-card-text class="pa-0 planList">
                     <v-list-item class="pa-0">
                       <v-list-item-content>
-                        <v-text-field v-model="plan.time" label="時刻" class="ma-0"></v-text-field>
+                        <v-row align="center">
+                          <v-col align-content="center">
+                            <v-select :items="canSelectTime" v-model="plan.time" label="時刻" class="ma-0"></v-select>
+                          </v-col>
+                          <v-col cols="1">
+                            〜
+                          </v-col>
+                          <v-col>
+                            <v-select :items="canSelectTime" v-model="plan.time" label="時刻" class="ma-0"></v-select>
+                          </v-col>
+                        </v-row>
                         <v-text-field v-model="plan.name" label="予定" :counter="20" class="ma-0"></v-text-field>
-                        <v-checkbox label="移動時間とする"></v-checkbox>
                       </v-list-item-content>
                       <v-list-item-icon><v-icon @click="deleteContent(plan.id)">mdi-trash-can-outline</v-icon></v-list-item-icon>
                     </v-list-item>
@@ -98,10 +95,34 @@
             <v-row align-content="center">
               <v-col class="col-lg-8 col-12" align="center">
                 <div class="mb-4 title font-weight-bold purple--text text-center">設定</div>
-                <v-btn class="purple font-weight-bold white--text" @click="addContent">要素を追加する</v-btn>
+                <div>
+                  <v-btn class="purple font-weight-bold white--text" @click="addContent">要素を追加する</v-btn>
+                </div>
+                <div>
+                  <v-btn class="purple font-weight-bold white--text mt-4" @click="addMoving" >移動時間を作成する</v-btn>
+                </div>
+                <div>
+                  <v-btn class="purple font-weight-bold white--text mt-4" @click="removeSchedule" >スケジュールをリセットする</v-btn>
+                </div>
               </v-col>
               <v-col class="col-lg-4 col-12">
                 <div class="title font-weight-bold purple--text text-center">タイトル</div>
+                    <v-avatar>
+                      <v-img
+                        src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFrida&accessoriesType=Kurt&hairColor=Red&facialHairType=BeardLight&facialHairColor=BrownDark&clotheType=GraphicShirt&clotheColor=Gray01&graphicType=Skull&eyeType=Wink&eyebrowType=RaisedExcitedNatural&mouthType=Disbelief&skinColor=Brown"
+                      ></v-img>
+                    </v-avatar>
+                    ああああ
+                    <v-avatar>
+                      <v-img
+                        src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairFrizzle&accessoriesType=Prescription02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=BrownDark&clotheType=BlazerSweater&clotheColor=Black&eyeType=Default&eyebrowType=FlatNatural&mouthType=Default&skinColor=Tanned"
+                      ></v-img>
+                    </v-avatar>
+                    <v-avatar>
+                      <v-img
+                        src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairMiaWallace&accessoriesType=Sunglasses&hairColor=BlondeGolden&facialHairType=Blank&clotheType=BlazerSweater&eyeType=Surprised&eyebrowType=RaisedExcited&mouthType=Smile&skinColor=Pale"
+                      ></v-img>
+                    </v-avatar>
               </v-col>
             </v-row>
           </v-sheet>
@@ -123,6 +144,40 @@
         return {
           displayFlg : false,
           delimiter: ';;',
+          canSelectTime: [
+            '8:30',
+            '9:00',
+            '9:30',
+            '10:00',
+            '10:30',
+            '11:00',
+            '11:30',
+            '12:00',
+            '12:30',
+            '13:00',
+            '13:30',
+            '14:00',
+            '14:30',
+            '15:00',
+            '15:30',
+            '16:00',
+            '16:30',
+            '17:00',
+            '17:30',
+            '18:00',
+            '18:30',
+            '19:00',
+            '19:30',
+            '20:00',
+            '20:30',
+            '21:00',
+            '21:30',
+            '22:00',
+            '22:30',
+            '23:00',
+            '23:30',
+            '24:00',
+          ],
           plans : [
             // {id: 1, time:'8:30-10:30', name: '奈良金魚ミュージアム', description:'テスト'},
             // {id: 2, time:'10:30-12:30', name: '奈良旅行2', description:'テスト'},
@@ -164,8 +219,12 @@
           const newestId = Math.max(...this.plans.map(item => item.id));
           const plan = {id: newestId + 1, time:'', name:'', description:''}
           this.plans.push(plan);
-          console.log(this.plans)
-
+        },
+        addMoving() {
+          // 最新のIDを取得する
+          const newestId = Math.max(...this.plans.map(item => item.id));
+          const plan = {id: newestId + 1, time:'', name:'移動', description:''}
+          this.plans.push(plan);
         },
         createSchedule(){
           const DELIMITER =this.delimiter 
@@ -176,12 +235,15 @@
             const plan = this.plans[i]
             queryParams[plan.id] = plan.time + DELIMITER + plan.name + DELIMITER + plan.description
           }
-
           const urlParams = new URLSearchParams(queryParams);
           const url = `?${urlParams.toString()}`;
           console.log(url)
           window.location.href = url
-
+        },
+        removeSchedule() {
+          const url = window.location.href;
+          const new_url = url.replace(/\?.*$/,"");
+          window.location.href = new_url
         },
 
         /**
