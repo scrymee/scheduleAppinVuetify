@@ -23,7 +23,7 @@
 
       <v-main class="grey lighten-3">
         <v-container v-if="displayFlg" class="pt-6" ><v-col align="center">
-          <v-sheet elevation="1" max-width="1000px">
+          <v-sheet elevation="1" max-width="1000px" class="pr-2">
             <v-timeline
               align-top
               dense
@@ -35,15 +35,12 @@
                 :color="plan.id % 2 ? 'teal' : 'pink'"
               >
                 <v-row class="pt-1">
-                  <v-col cols="3">
-                    <strong>{{plan.time}}</strong>
-                  </v-col>
                   <v-col>
                     <strong>{{plan.name}}</strong>
                     <div class="text-caption mb-2">
-                      Hangouts
+                      <v-icon class="text-caption">mdi-clock-outline</v-icon>{{plan.time}}
                     </div>
-                    <v-avatar>
+                    <!-- <v-avatar>
                       <v-img
                         src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFrida&accessoriesType=Kurt&hairColor=Red&facialHairType=BeardLight&facialHairColor=BrownDark&clotheType=GraphicShirt&clotheColor=Gray01&graphicType=Skull&eyeType=Wink&eyebrowType=RaisedExcitedNatural&mouthType=Disbelief&skinColor=Brown"
                       ></v-img>
@@ -57,7 +54,7 @@
                       <v-img
                         src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairMiaWallace&accessoriesType=Sunglasses&hairColor=BlondeGolden&facialHairType=Blank&clotheType=BlazerSweater&eyeType=Surprised&eyebrowType=RaisedExcited&mouthType=Smile&skinColor=Pale"
                       ></v-img>
-                    </v-avatar>
+                    </v-avatar> -->
                   </v-col>
                 </v-row>
               </v-timeline-item>
@@ -85,11 +82,11 @@
               <v-col align="center">
                 <v-card class="my-2 col-12" v-for="plan in plans" :key="plan.id">
                   <v-card-text class="pa-0 planList">
-                    <v-list-item>
-                      <v-list-item-icon><v-icon class="text-h3 purple--text">mdi-map-marker-check</v-icon></v-list-item-icon>
+                    <v-list-item class="pa-0">
                       <v-list-item-content>
+                        <v-text-field v-model="plan.time" label="時刻" class="ma-0"></v-text-field>
                         <v-text-field v-model="plan.name" label="予定" :counter="20" class="ma-0"></v-text-field>
-                        <!-- {{plan.name}} -->
+                        <v-checkbox label="移動時間とする"></v-checkbox>
                       </v-list-item-content>
                       <v-list-item-icon><v-icon @click="deleteContent(plan.id)">mdi-trash-can-outline</v-icon></v-list-item-icon>
                     </v-list-item>
@@ -125,17 +122,44 @@
       data () {
         return {
           displayFlg : false,
+          delimiter: ';;',
           plans : [
-            {id: 1, time:'8:30', name: '奈良金魚ミュージアム', description:'テスト'},
-            {id: 2, time:'8:30', name: '奈良旅行', description:'テスト'},
-            {id: 3, time:'8:30', name: '奈良旅行', description:'テスト'},
-            {id: 4, time:'8:30', name: '奈良旅行', description:'テスト'},
+            // {id: 1, time:'8:30-10:30', name: '奈良金魚ミュージアム', description:'テスト'},
+            // {id: 2, time:'10:30-12:30', name: '奈良旅行2', description:'テスト'},
+            // {id: 3, time:'8:30', name: '奈良旅行3', description:'テスト'},
+            // {id: 4, time:'8:30', name: '奈良旅行4', description:'テスト'},
           ],
         }
       },
-      methods: {
-        addContent() {
+      // //DOM生成後
+      // mounted() {
+      // },
 
+      // DOM生成前
+      created() {
+        const queryParams = window.location.search
+        if(queryParams) {
+          const query = new URLSearchParams(queryParams)
+          const queryList = Array.from(query.entries())
+          for (let i=0; i < queryList.length; i++) {
+            const planData = queryList[i][1]
+            const planArr = planData.split(this.delimiter)
+            let plan = {};
+            plan.id = this.plans.length + 1
+            plan.time = planArr[0]
+            plan.name = planArr[1]
+            plan.description = planArr[2]
+            this.plans.push(plan)
+          }
+          this.displayFlg = true
+        }
+
+      },
+      methods: {
+        /**
+         * 要素を追加する
+         */
+        addContent() {
           // 最新のIDを取得する
           const newestId = Math.max(...this.plans.map(item => item.id));
           const plan = {id: newestId + 1, time:'', name:'', description:''}
@@ -144,14 +168,29 @@
 
         },
         createSchedule(){
+          const DELIMITER =this.delimiter 
           this.displayFlg = true
+          let queryParams = {};
+          console.log(this.plans)
+          for (let i = 0; i < this.plans.length; i++) {
+            const plan = this.plans[i]
+            queryParams[plan.id] = plan.time + DELIMITER + plan.name + DELIMITER + plan.description
+          }
+
+          const urlParams = new URLSearchParams(queryParams);
+          const url = `?${urlParams.toString()}`;
+          console.log(url)
+          window.location.href = url
 
         },
 
+        /**
+         * 要素を削除する
+         */
         deleteContent(id) {
           console.log(id)
           this.plans = this.plans.filter(plan => plan.id !== id)
-        }
+        },
       },
       directives: {
       },
