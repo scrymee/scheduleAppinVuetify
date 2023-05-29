@@ -29,19 +29,19 @@
               dense
             >
               <v-timeline-item
-                v-for="plan in plans"
+                v-for="(plan, index) in plans"
                 :key="plan.id"
                 small
-                :color="plan.id % 2 ? 'teal' : 'pink'"
+                :color="index % 2 ? 'teal' : 'pink'"
               >
                 <v-row class="pt-1">
                   <v-col cols="3">
-                    <strong>{{plan.id}}:30</strong>
+                    <strong>{{plan.fromTime}}</strong>
                   </v-col>
                   <v-col>
                     <strong>{{plan.name}}</strong>
                     <div class="text-caption mb-2">
-                      <v-icon class="text-caption">mdi-clock-outline</v-icon>{{plan.time}}
+                      <v-icon class="text-caption">mdi-clock-outline</v-icon>{{plan.fromTime}}〜{{plan.toTime}}
                     </div>
                   </v-col>
                 </v-row>
@@ -58,39 +58,40 @@
             class="mt-6 pa-4"
             elevation="1"
           >
-
-            <!-- <pre v-if="displayFlg">{{ JSON.stringify(plans, null, 2) }}</pre> -->
             <v-row align-content="center" class="my-4">
               <v-col align="center">
                 <div class="title font-weight-bold purple--text">予定を入力して素敵な予定を決めよう！</div>
                 <v-btn @click="createSchedule" class="purple font-weight-bold white--text mt-4">予定を作成する</v-btn>
               </v-col>
             </v-row>
-            <v-row align-content="center">
-              <v-col align="center">
-                <v-card class="my-2 col-12" v-for="plan in plans" :key="plan.id">
-                  <v-card-text class="pa-0 planList">
-                    <v-list-item class="pa-0">
-                      <v-list-item-content>
-                        <v-row align="center">
-                          <v-col align-content="center">
-                            <v-select :items="canSelectTime" v-model="plan.time" label="時刻" class="ma-0"></v-select>
-                          </v-col>
-                          <v-col cols="1">
-                            〜
-                          </v-col>
-                          <v-col>
-                            <v-select :items="canSelectTime" v-model="plan.time" label="時刻" class="ma-0"></v-select>
-                          </v-col>
-                        </v-row>
-                        <v-text-field v-model="plan.name" label="予定" :counter="20" class="ma-0"></v-text-field>
-                      </v-list-item-content>
-                      <v-list-item-icon><v-icon @click="deleteContent(plan.id)">mdi-trash-can-outline</v-icon></v-list-item-icon>
-                    </v-list-item>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
+            
+            <v-card class="my-2 col-12" v-for="(item, index) in plans" :key="item.id">
+              <v-card-text class="pa-0 planList">
+                <v-list-item class="pa-0">
+                  <v-list-item-content>
+                    <v-row align="center">
+                      <v-col align-content="center">
+                        <v-select :items="canSelectTime" v-model="item.fromTime" label="時刻" class="ma-0"></v-select>
+                      </v-col>
+                      <v-col cols="1">
+                        〜
+                      </v-col>
+                      <v-col>
+                        <v-select :items="canSelectTime" v-model="item.toTime" label="時刻" class="ma-0"></v-select>
+                      </v-col>
+                    </v-row>
+                    <v-text-field v-model="item.name" label="予定" :counter="20" class="ma-0"></v-text-field>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-card-text>
+              <v-card-actions class="pa-0">
+                <v-icon @click="upContent(index)">mdi-arrow-up-bold</v-icon>
+                <v-icon @click="downContent(index)">mdi-arrow-down-bold</v-icon>
+                <v-row align="center" justify="end">
+                  <v-icon @click="deleteContent(item.id)" class="mr-2">mdi-trash-can-outline</v-icon>
+                </v-row>
+              </v-card-actions>
+            </v-card>
 
             <v-row align-content="center">
               <v-col class="col-lg-8 col-12" align="center">
@@ -144,6 +145,14 @@
         return {
           displayFlg : false,
           delimiter: ';;',
+          headers: [
+            {
+              text: '予定',
+              align: 'start',
+              sortable: false,
+              value: 'name',
+            },
+          ],
           canSelectTime: [
             '8:30',
             '9:00',
@@ -201,9 +210,10 @@
             const planArr = planData.split(this.delimiter)
             let plan = {};
             plan.id = this.plans.length + 1
-            plan.time = planArr[0]
-            plan.name = planArr[1]
-            plan.description = planArr[2]
+            plan.fromTime = planArr[0]
+            plan.toTime = planArr[1]
+            plan.name = planArr[2]
+            plan.description = planArr[3]
             this.plans.push(plan)
           }
           this.displayFlg = true
@@ -215,15 +225,20 @@
          * 要素を追加する
          */
         addContent() {
+          this.displayFlg = false
           // 最新のIDを取得する
           const newestId = Math.max(...this.plans.map(item => item.id));
-          const plan = {id: newestId + 1, time:'', name:'', description:''}
+          const newestPlan = this.plans.filter(plan => plan.id == newestId)
+          console.log(newestPlan)
+          const fromTime = newestPlan.length ? newestPlan[0].toTime : ''
+          const plan = {id: newestId + 1, fromTime: fromTime, toTime:'', name:'', description:''}
           this.plans.push(plan);
         },
         addMoving() {
+          this.displayFlg = false
           // 最新のIDを取得する
           const newestId = Math.max(...this.plans.map(item => item.id));
-          const plan = {id: newestId + 1, time:'', name:'移動', description:''}
+          const plan = {id: newestId + 1, fromTime:'', toTime:'', name:'移動', description:''}
           this.plans.push(plan);
         },
         createSchedule(){
@@ -233,7 +248,7 @@
           console.log(this.plans)
           for (let i = 0; i < this.plans.length; i++) {
             const plan = this.plans[i]
-            queryParams[plan.id] = plan.time + DELIMITER + plan.name + DELIMITER + plan.description
+            queryParams[plan.id] = plan.fromTime + DELIMITER + plan.toTime + DELIMITER + plan.name + DELIMITER + plan.description
           }
           const urlParams = new URLSearchParams(queryParams);
           const url = `?${urlParams.toString()}`;
@@ -241,6 +256,7 @@
           window.location.href = url
         },
         removeSchedule() {
+          this.displayFlg = false
           const url = window.location.href;
           const new_url = url.replace(/\?.*$/,"");
           window.location.href = new_url
@@ -250,11 +266,25 @@
          * 要素を削除する
          */
         deleteContent(id) {
-          console.log(id)
+          const res = confirm('削除しますか？')
+          this.displayFlg = false
+          if(!res) return
           this.plans = this.plans.filter(plan => plan.id !== id)
         },
-      },
-      directives: {
+        downContent (oldIndex) {
+          if(oldIndex + 1 > this.plans.length ) return
+          this.displayFlg = false
+          const movedItem = this.plans.splice(oldIndex, 1)[0];
+          console.log(oldIndex)
+          this.plans.splice(oldIndex + 1, 0, movedItem);
+        },
+        upContent (oldIndex) {
+          if(oldIndex - 1 < 0 ) return
+          this.displayFlg = false
+          const movedItem = this.plans.splice(oldIndex, 1)[0];
+          this.plans.splice(oldIndex - 1, 0, movedItem);
+          console.log(oldIndex)
+        },
       },
     })
   </script>
