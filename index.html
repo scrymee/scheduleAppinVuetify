@@ -24,8 +24,8 @@
       <v-main class="grey lighten-3">
         <v-container v-if="displayFlg" class="pt-6" ><v-col align="center">
           <v-sheet
-            max-width="1000px"
-            elevation="1"
+            max-width="860px"
+            elevation="5"
           >
             <v-subheader dark class="teal text--white font-weight-bold">予定表</v-subheader>
             <v-timeline
@@ -57,10 +57,10 @@
         <v-container><v-col align="center">
           <v-sheet
             min-height="70vh"
-            max-width="1000px"
+            max-width="860px"
             rounded="lg"
             class="mt-6 pa-4"
-            elevation="1"
+            elevation="5"
           >
             <v-row align-content="center" class="my-4">
               <v-col align="center">
@@ -74,14 +74,14 @@
                 <v-list-item class="pa-0">
                   <v-list-item-content>
                     <v-row align="center">
-                      <v-col align-content="center">
-                        <v-select :items="canSelectTime" v-model="item.fromTime" @change="setToTime(index, 2)" label="時刻" class="ma-0"></v-select>
+                      <v-col align-content="center" class="py-0">
+                        <v-select hide-details = "true" :items="canSelectTime" v-model="item.fromTime" @change="setToTime(index, 2)" label="時刻" class="ma-0"></v-select>
                       </v-col>
-                      <v-col cols="1">
+                      <v-col cols="1" class="pa-0">
                         〜
                       </v-col>
                       <v-col>
-                        <v-select :items="canSelectTime" v-model="item.toTime" label="時刻" class="ma-0"></v-select>
+                        <v-select hide-details = "true" :items="canSelectTime" v-model="item.toTime" label="時刻" class="ma-0"></v-select>
                       </v-col>
                     </v-row>
                     <v-text-field v-model="item.name" label="予定" :counter="20" class="ma-0"></v-text-field>
@@ -287,24 +287,24 @@
           this.plans[index].toTime = toTime
         }
       },
-computed: {
-  addHour() {
-    return (time, hour) => {
-      // 入力された時間をDateオブジェクトに変換
-      const inputDateTime = new Date(`2000-01-01 ${time}`);
-      // 2時間を加算
-      inputDateTime.setHours(inputDateTime.getHours() + hour);
+      computed: {
+        addHour() {
+          return (time, hour) => {
+            // 入力された時間をDateオブジェクトに変換
+            const inputDateTime = new Date(`2000-01-01 ${time}`);
+            // 2時間を加算
+            inputDateTime.setHours(inputDateTime.getHours() + hour);
 
-      // 結果をフォーマットして出力
-      const resultHours = inputDateTime.getHours().toString().padStart(2, '0');
-      const resultMinutes = inputDateTime.getMinutes().toString().padStart(2, '0');
-      const resultTime = `${resultHours}:${resultMinutes}`;
+            // 結果をフォーマットして出力
+            const resultHours = inputDateTime.getHours().toString().padStart(2, '0');
+            const resultMinutes = inputDateTime.getMinutes().toString().padStart(2, '0');
+            const resultTime = `${resultHours}:${resultMinutes}`;
 
-      console.log(resultTime);
-      return resultTime;
-    };
-  }
-}
+            console.log(resultTime);
+            return resultTime;
+          };
+        }
+      }
     })
   </script>
   <style>
