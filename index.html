@@ -23,7 +23,11 @@
 
       <v-main class="grey lighten-3">
         <v-container v-if="displayFlg" class="pt-6" ><v-col align="center">
-          <v-sheet elevation="1" max-width="1000px" class="pr-2">
+          <v-sheet
+            max-width="1000px"
+            elevation="1"
+          >
+            <v-subheader dark class="teal text--white font-weight-bold">予定表</v-subheader>
             <v-timeline
               align-top
               dense
@@ -61,7 +65,7 @@
             <v-row align-content="center" class="my-4">
               <v-col align="center">
                 <div class="title font-weight-bold purple--text">予定を入力して素敵な予定を決めよう！</div>
-                <v-btn @click="createSchedule" class="purple font-weight-bold white--text mt-4">予定を作成する</v-btn>
+                <v-btn @click="createSchedule" class="red font-weight-bold white--text mt-4">予定を作成する</v-btn>
               </v-col>
             </v-row>
             
@@ -71,7 +75,7 @@
                   <v-list-item-content>
                     <v-row align="center">
                       <v-col align-content="center">
-                        <v-select :items="canSelectTime" v-model="item.fromTime" label="時刻" class="ma-0"></v-select>
+                        <v-select :items="canSelectTime" v-model="item.fromTime" @change="setToTime(index, 2)" label="時刻" class="ma-0"></v-select>
                       </v-col>
                       <v-col cols="1">
                         〜
@@ -96,34 +100,27 @@
             <v-row align-content="center">
               <v-col class="col-lg-8 col-12" align="center">
                 <div class="mb-4 title font-weight-bold purple--text text-center">設定</div>
-                <div>
-                  <v-btn class="purple font-weight-bold white--text" @click="addContent">要素を追加する</v-btn>
+                <div class="mt-8 mb-4 font-weight-bold purple--text text-center">要素の追加</div>
+                <v-row>
+                  <v-col class="col-12 col-lg-4">
+                    <v-btn class="blue font-weight-bold white--text" @click="addContent">カレンダー</v-btn>
+                  </v-col>
+                  <v-col class="col-12 col-lg-8">
+                    <v-btn class="mx-1" @click="addMoving('徒歩')">🚶</v-btn>
+                    <v-btn class="mx-1" @click="addMoving('車')" >🚗</v-btn>
+                    <v-btn class="mx-1" @click="addMoving('電車')" >🚃</v-btn>
+                    <v-btn class="mx-1" @click="addMoving('バス')" >🚌</v-btn>
+                  </v-col>
+                </v-row>
+                <div class="mt-6 text-center">
+                  <span class="mt-4 text-decoration-underline" @click="createSchedule" >予定を作成する</span>
                 </div>
-                <div>
-                  <v-btn class="purple font-weight-bold white--text mt-4" @click="addMoving" >移動時間を作成する</v-btn>
-                </div>
-                <div>
-                  <v-btn class="purple font-weight-bold white--text mt-4" @click="removeSchedule" >スケジュールをリセットする</v-btn>
+                <div class="mt-6 text-center">
+                  <span class="mt-4 text-decoration-underline" @click="deleteSchedule" >スケジュールをリセットする</span>
                 </div>
               </v-col>
               <v-col class="col-lg-4 col-12">
                 <div class="title font-weight-bold purple--text text-center">タイトル</div>
-                    <v-avatar>
-                      <v-img
-                        src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFrida&accessoriesType=Kurt&hairColor=Red&facialHairType=BeardLight&facialHairColor=BrownDark&clotheType=GraphicShirt&clotheColor=Gray01&graphicType=Skull&eyeType=Wink&eyebrowType=RaisedExcitedNatural&mouthType=Disbelief&skinColor=Brown"
-                      ></v-img>
-                    </v-avatar>
-                    ああああ
-                    <v-avatar>
-                      <v-img
-                        src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairFrizzle&accessoriesType=Prescription02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=BrownDark&clotheType=BlazerSweater&clotheColor=Black&eyeType=Default&eyebrowType=FlatNatural&mouthType=Default&skinColor=Tanned"
-                      ></v-img>
-                    </v-avatar>
-                    <v-avatar>
-                      <v-img
-                        src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairMiaWallace&accessoriesType=Sunglasses&hairColor=BlondeGolden&facialHairType=Blank&clotheType=BlazerSweater&eyeType=Surprised&eyebrowType=RaisedExcited&mouthType=Smile&skinColor=Pale"
-                      ></v-img>
-                    </v-avatar>
               </v-col>
             </v-row>
           </v-sheet>
@@ -188,10 +185,6 @@
             '24:00',
           ],
           plans : [
-            // {id: 1, time:'8:30-10:30', name: '奈良金魚ミュージアム', description:'テスト'},
-            // {id: 2, time:'10:30-12:30', name: '奈良旅行2', description:'テスト'},
-            // {id: 3, time:'8:30', name: '奈良旅行3', description:'テスト'},
-            // {id: 4, time:'8:30', name: '奈良旅行4', description:'テスト'},
           ],
         }
       },
@@ -213,7 +206,6 @@
             plan.fromTime = planArr[0]
             plan.toTime = planArr[1]
             plan.name = planArr[2]
-            plan.description = planArr[3]
             this.plans.push(plan)
           }
           this.displayFlg = true
@@ -227,18 +219,22 @@
         addContent() {
           this.displayFlg = false
           // 最新のIDを取得する
-          const newestId = Math.max(...this.plans.map(item => item.id));
+          const newestId = this.plans.length ? Math.max(...this.plans.map(item => item.id)) : 0 ;
           const newestPlan = this.plans.filter(plan => plan.id == newestId)
-          console.log(newestPlan)
-          const fromTime = newestPlan.length ? newestPlan[0].toTime : ''
-          const plan = {id: newestId + 1, fromTime: fromTime, toTime:'', name:'', description:''}
+          let fromTime = ''
+          let toTime = ''
+          if(newestPlan.length) {
+            fromTime = newestPlan[0].toTime
+            toTime = this.addHour(newestPlan[0].toTime, 2)
+          }
+          const plan = {id: newestId + 1, fromTime: fromTime, toTime:toTime, name:''}
           this.plans.push(plan);
         },
-        addMoving() {
+        addMoving(type) {
           this.displayFlg = false
           // 最新のIDを取得する
           const newestId = Math.max(...this.plans.map(item => item.id));
-          const plan = {id: newestId + 1, fromTime:'', toTime:'', name:'移動', description:''}
+          const plan = {id: newestId + 1, fromTime:'', toTime:'', name:'移動 ('+ type + ')'}
           this.plans.push(plan);
         },
         createSchedule(){
@@ -248,14 +244,14 @@
           console.log(this.plans)
           for (let i = 0; i < this.plans.length; i++) {
             const plan = this.plans[i]
-            queryParams[plan.id] = plan.fromTime + DELIMITER + plan.toTime + DELIMITER + plan.name + DELIMITER + plan.description
+            queryParams[plan.id] = plan.fromTime + DELIMITER + plan.toTime + DELIMITER + plan.name
           }
           const urlParams = new URLSearchParams(queryParams);
           const url = `?${urlParams.toString()}`;
           console.log(url)
           window.location.href = url
         },
-        removeSchedule() {
+        deleteSchedule() {
           this.displayFlg = false
           const url = window.location.href;
           const new_url = url.replace(/\?.*$/,"");
@@ -285,7 +281,30 @@
           this.plans.splice(oldIndex - 1, 0, movedItem);
           console.log(oldIndex)
         },
+        setToTime(index, hour) {
+          const plan = this.plans[index]
+          const toTime = this.addHour(plan.fromTime, hour)
+          this.plans[index].toTime = toTime
+        }
       },
+computed: {
+  addHour() {
+    return (time, hour) => {
+      // 入力された時間をDateオブジェクトに変換
+      const inputDateTime = new Date(`2000-01-01 ${time}`);
+      // 2時間を加算
+      inputDateTime.setHours(inputDateTime.getHours() + hour);
+
+      // 結果をフォーマットして出力
+      const resultHours = inputDateTime.getHours().toString().padStart(2, '0');
+      const resultMinutes = inputDateTime.getMinutes().toString().padStart(2, '0');
+      const resultTime = `${resultHours}:${resultMinutes}`;
+
+      console.log(resultTime);
+      return resultTime;
+    };
+  }
+}
     })
   </script>
   <style>
