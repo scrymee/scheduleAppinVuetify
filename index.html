@@ -10,6 +10,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&family=Noto+Sans+JP&display=swap" rel="stylesheet">
+  <!-- ogp -->
+  <meta content="これはOGP" property="og:title">
+<meta content="summary_large_image" name="twitter:card">
+<meta content="./ogp.png" property="og:image">
+<meta content="http://127.0.0.1:5500/" property="og:url">`
 </head>
 <body>
   <div id="app">
@@ -22,12 +27,14 @@
       </v-app-bar>
 
       <v-main class="grey lighten-3">
-        <v-container v-if="displayFlg" class="pt-6" ><v-col align="center">
+        <v-container v-if="displayFlg" class="" ><v-col align="center">
+          <v-sheet max-width="540px" class="pa-0 mb-6 transparent" id="canvasContent">
+            <canvas id="canvas"></canvas>
+          </v-sheet>
           <v-sheet
-            max-width="860px"
+            max-width="540px"
             elevation="5"
           >
-            <v-subheader dark class="teal text--white font-weight-bold">予定表</v-subheader>
             <v-timeline
               align-top
               dense
@@ -56,76 +63,96 @@
 
         <v-container><v-col align="center">
           <v-sheet
-            min-height="70vh"
-            max-width="860px"
+            max-width="540px"
             rounded="lg"
             class="mt-6 pa-4"
             elevation="5"
           >
             <v-row align-content="center" class="my-4">
               <v-col align="center">
-                <div class="title font-weight-bold purple--text">予定を入力して素敵な予定を決めよう！</div>
-                <v-btn @click="createSchedule" class="red font-weight-bold white--text mt-4">予定を作成する</v-btn>
-              </v-col>
-            </v-row>
-            
-            <v-card class="my-2 col-12" v-for="(item, index) in plans" :key="item.id">
-              <v-card-text class="pa-0 planList">
-                <v-list-item class="pa-0">
-                  <v-list-item-content>
-                    <v-row align="center">
-                      <v-col align-content="center" class="py-0">
-                        <v-select hide-details = "true" :items="canSelectTime" v-model="item.fromTime" @change="setToTime(index, 2)" label="時刻" class="ma-0"></v-select>
-                      </v-col>
-                      <v-col cols="1" class="pa-0">
-                        〜
-                      </v-col>
-                      <v-col>
-                        <v-select hide-details = "true" :items="canSelectTime" v-model="item.toTime" label="時刻" class="ma-0"></v-select>
-                      </v-col>
-                    </v-row>
-                    <v-text-field v-model="item.name" label="予定" :counter="20" class="ma-0"></v-text-field>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-card-text>
-              <v-card-actions class="pa-0">
-                <v-icon @click="upContent(index)">mdi-arrow-up-bold</v-icon>
-                <v-icon @click="downContent(index)">mdi-arrow-down-bold</v-icon>
-                <v-row align="center" justify="end">
-                  <v-icon @click="deleteContent(item.id)" class="mr-2">mdi-trash-can-outline</v-icon>
-                </v-row>
-              </v-card-actions>
-            </v-card>
+                <div class="title font-weight-bold black--text">予定を入力して素敵な予定を決めよう！</div>
+                <template v-if="displayFlg">
+                  <v-btn @click="displayFlg = false" class="red font-weight-bold white--text mt-4">予定を編集する</v-btn>
+                  <v-text-field v-model="url" label="共有URL" class="ma-0" @focus="selectAllText"></v-text-field>
 
-            <v-row align-content="center">
-              <v-col class="col-lg-8 col-12" align="center">
-                <div class="mb-4 title font-weight-bold purple--text text-center">設定</div>
-                <div class="mt-8 mb-4 font-weight-bold purple--text text-center">要素の追加</div>
-                <v-row>
-                  <v-col class="col-12 col-lg-4">
-                    <v-btn class="blue font-weight-bold white--text" @click="addContent">カレンダー</v-btn>
-                  </v-col>
-                  <v-col class="col-12 col-lg-8">
-                    <v-btn class="mx-1" @click="addMoving('徒歩')">🚶</v-btn>
-                    <v-btn class="mx-1" @click="addMoving('車')" >🚗</v-btn>
-                    <v-btn class="mx-1" @click="addMoving('電車')" >🚃</v-btn>
-                    <v-btn class="mx-1" @click="addMoving('バス')" >🚌</v-btn>
-                  </v-col>
-                </v-row>
-                <div class="mt-6 text-center">
-                  <span class="mt-4 text-decoration-underline" @click="createSchedule" >予定を作成する</span>
-                </div>
-                <div class="mt-6 text-center">
-                  <span class="mt-4 text-decoration-underline" @click="deleteSchedule" >スケジュールをリセットする</span>
-                </div>
-              </v-col>
-              <v-col class="col-lg-4 col-12">
-                <div class="title font-weight-bold purple--text text-center">タイトル</div>
+                </template>
               </v-col>
             </v-row>
+
+            <template v-if="!displayFlg">
+
+            
+              <v-card class="my-2 col-12" v-for="(item, index) in plans" :key="item.id">
+                <v-card-text class="pa-0 planList">
+                  <v-list-item class="pa-0">
+                    <v-list-item-content>
+                      <v-row align="center">
+                        <v-col align-content="center" class="py-0">
+                          <v-select hide-details = "true" :items="canSelectTime" v-model="item.fromTime" @change="setToTime(index, 2)" label="時刻" class="ma-0"></v-select>
+                        </v-col>
+                        <v-col cols="1" class="pa-0">
+                          〜
+                        </v-col>
+                        <v-col>
+                          <v-select hide-details = "true" :items="canSelectTime" v-model="item.toTime" label="時刻" class="ma-0"></v-select>
+                        </v-col>
+                      </v-row>
+                      <v-text-field v-model="item.name" label="予定" :counter="20" class="ma-0"></v-text-field>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-card-text>
+                <v-card-actions class="pa-0">
+                  <v-icon @click="upContent(index)">mdi-arrow-up-bold</v-icon>
+                  <v-icon @click="downContent(index)">mdi-arrow-down-bold</v-icon>
+                  <v-row align="center" justify="end">
+                    <v-icon @click="deleteContent(item.id)" class="mr-2">mdi-trash-can-outline</v-icon>
+                  </v-row>
+                </v-card-actions>
+              </v-card>
+
+              <v-row align-content="center">
+                <v-col class="col-lg-8 col-12" align="center">
+                  <div class="mb-4 title font-weight-bold green--text text-center">設定</div>
+                    <v-text-field v-model="planTitle" label="タイトル" :counter="20" class="ma-0"></v-text-field>
+                  <div class="mt-8 mb-4 font-weight-bold green--text text-center">要素の追加</div>
+                  <v-row>
+                    <v-col class="col-12 col-lg-4">
+                      <v-btn outlined rounded size="x-large" @click="addContent">
+                        <v-icon left>
+                          mdi-plus
+                        </v-icon>
+                        予定を追加
+                      </v-btn> 
+                    </v-col>
+                    <!-- <v-col class="col-12 col-lg-8">
+                      <v-btn class="mx-1" @click="addMoving('徒歩')">🚶</v-btn>
+                      <v-btn class="mx-1" @click="addMoving('車')" >🚗</v-btn>
+                      <v-btn class="mx-1" @click="addMoving('電車')" >🚃</v-btn>
+                      <v-btn class="mx-1" @click="addMoving('バス')" >🚌</v-btn>
+                      <v-btn outlined rounded size="x-large" @click="addMoving('車')">
+                    </v-col> -->
+                  </v-row>
+                  <div class="mt-6 text-center">
+                    <v-btn @click="createSchedule" class="red font-weight-bold white--text mt-4">予定を作成する</v-btn>
+                  </div>
+                  <div class="mt-6 text-center">
+                    <span class="mt-4 text-decoration-underline" @click="deleteSchedule" >スケジュールをリセットする</span>
+                  </div>
+                </v-col>
+                <v-col class="col-lg-4 col-12">
+                  <div class="title font-weight-bold black--text text-center">タイトル</div>
+                </v-col>
+              </v-row>
+            </template>
           </v-sheet>
         </v-col></v-container>
       </v-main>
+      <v-footer
+        dark
+        class="text-center"
+      >
+        <div class="pa-4 text-center">{{ new Date().getFullYear() }} — <strong>予定表ジェネレーター</strong></div>
+      </v-footer>
     </v-app>
   </div>
 
@@ -184,13 +211,45 @@
             '23:30',
             '24:00',
           ],
+          url:'',
+          planTitle: '',
           plans : [
           ],
         }
       },
       // //DOM生成後
-      // mounted() {
-      // },
+      mounted() {
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+        const img = new Image();
+        img.src = 'ogp.png'
+        img.onload = () => {
+          // 画像の横幅と高さを取得
+          const imageWidth = img.width;
+          const imageHeight = img.height;
+
+          // キャンバスの横幅を指定
+          const canvasWidth = document.getElementById('canvasContent').clientWidth;
+
+          // 横幅比を計算
+          const aspectRatio = canvasWidth / imageWidth;
+
+          // キャンバスの高さを計算
+          const canvasHeight = imageHeight * aspectRatio;
+
+          // キャンバスのサイズを設定
+          canvas.width = canvasWidth;
+          canvas.height = canvasHeight;
+
+          // 画像をCanvas上に描画
+          ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+          ctx.font = "20px 'M PLUS Rounded 1c'";
+          const text = this.planTitle
+          const textWidth = ctx.measureText( text ).width ;
+          ctx.fillText(text, (canvasWidth - textWidth) / 2, canvasHeight / 2);
+        }
+
+      },
 
       // DOM生成前
       created() {
@@ -199,8 +258,14 @@
           const query = new URLSearchParams(queryParams)
           const queryList = Array.from(query.entries())
           for (let i=0; i < queryList.length; i++) {
+            const planId = queryList[i][0]
             const planData = queryList[i][1]
+            if(planId =='title') {
+              this.planTitle = planData 
+              continue
+            }
             const planArr = planData.split(this.delimiter)
+            console.log(planArr)
             let plan = {};
             plan.id = this.plans.length + 1
             plan.fromTime = planArr[0]
@@ -209,6 +274,8 @@
             this.plans.push(plan)
           }
           this.displayFlg = true
+          
+          this.url = window.location.href
         }
 
       },
@@ -218,23 +285,13 @@
          */
         addContent() {
           this.displayFlg = false
-          // 最新のIDを取得する
-          const newestId = this.plans.length ? Math.max(...this.plans.map(item => item.id)) : 0 ;
-          const newestPlan = this.plans.filter(plan => plan.id == newestId)
-          let fromTime = ''
-          let toTime = ''
-          if(newestPlan.length) {
-            fromTime = newestPlan[0].toTime
-            toTime = this.addHour(newestPlan[0].toTime, 2)
-          }
-          const plan = {id: newestId + 1, fromTime: fromTime, toTime:toTime, name:''}
+          const text = ''
+          plan = this.createPlan(text)
           this.plans.push(plan);
         },
         addMoving(type) {
-          this.displayFlg = false
-          // 最新のIDを取得する
-          const newestId = Math.max(...this.plans.map(item => item.id));
-          const plan = {id: newestId + 1, fromTime:'', toTime:'', name:'移動 ('+ type + ')'}
+          const text = '移動('+ type +')'
+          plan = this.createPlan(text)
           this.plans.push(plan);
         },
         createSchedule(){
@@ -242,9 +299,10 @@
           this.displayFlg = true
           let queryParams = {};
           console.log(this.plans)
+          queryParams['title'] = this.planTitle
           for (let i = 0; i < this.plans.length; i++) {
             const plan = this.plans[i]
-            queryParams[plan.id] = plan.fromTime + DELIMITER + plan.toTime + DELIMITER + plan.name
+            queryParams['p_'+i] = plan.fromTime + DELIMITER + plan.toTime + DELIMITER + plan.name
           }
           const urlParams = new URLSearchParams(queryParams);
           const url = `?${urlParams.toString()}`;
@@ -285,6 +343,9 @@
           const plan = this.plans[index]
           const toTime = this.addHour(plan.fromTime, hour)
           this.plans[index].toTime = toTime
+        },
+        selectAllText(event) {
+          event.target.select();
         }
       },
       computed: {
@@ -303,6 +364,21 @@
             console.log(resultTime);
             return resultTime;
           };
+        },
+        createPlan(text) {
+          return (text) => {
+            // 最新のIDを取得する
+            const newestId = this.plans.length ? Math.max(...this.plans.map(item => item.id)) : 0 ;
+            const newestPlan = this.plans.filter(plan => plan.id == newestId)
+            let fromTime = ''
+            let toTime = ''
+            if(newestPlan.length) {
+              fromTime = newestPlan[0].toTime
+              toTime = this.addHour(newestPlan[0].toTime, 2)
+            }
+            const plan = {id: newestId + 1, fromTime: fromTime, toTime:toTime, name: text}
+            return plan
+          }
         }
       }
     })
