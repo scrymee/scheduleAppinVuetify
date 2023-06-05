@@ -11,10 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&family=Noto+Sans+JP&display=swap" rel="stylesheet">
   <!-- ogp -->
-  <meta content="これはOGP" property="og:title">
+<meta content="予定表ジェネレータ" property="og:title">
 <meta content="summary_large_image" name="twitter:card">
-<meta content="./ogp.png" property="og:image">
-<meta content="http://127.0.0.1:5500/" property="og:url">`
+<meta content="http://127.0.0.1:5500/" property="og:url">
 </head>
 <body>
   <div id="app">
@@ -139,9 +138,6 @@
                     <span class="mt-4 text-decoration-underline" @click="deleteSchedule" >スケジュールをリセットする</span>
                   </div>
                 </v-col>
-                <v-col class="col-lg-4 col-12">
-                  <div class="title font-weight-bold black--text text-center">タイトル</div>
-                </v-col>
               </v-row>
             </template>
           </v-sheet>
@@ -247,6 +243,9 @@
           const text = this.planTitle
           const textWidth = ctx.measureText( text ).width ;
           ctx.fillText(text, (canvasWidth - textWidth) / 2, canvasHeight / 2);
+
+          const ogpUrl = this.generateCanvasUrl()
+          this.setOGPImageUrl(ogpUrl)
         }
 
       },
@@ -378,6 +377,21 @@
             }
             const plan = {id: newestId + 1, fromTime: fromTime, toTime:toTime, name: text}
             return plan
+          }
+        },
+        generateCanvasUrl() {
+          return () => {
+            const canvas = document.getElementById('canvas');
+            const dataUrl = canvas.toDataURL('image/png')
+            return dataUrl
+          }
+        },
+        setOGPImageUrl(url) {
+          return (url) => {
+            const metaTag = document.createElement('meta');
+            metaTag.setAttribute('property', 'og:image')
+            metaTag.setAttribute('content', url)
+            document.head.appendChild(metaTag)
           }
         }
       }
